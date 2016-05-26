@@ -236,7 +236,9 @@ class Plz {
 		wp_enqueue_script(
 			'theme-scripts',
 			get_template_directory_uri() .'/js/scripts.js',
-			['jquery']
+			['jquery'],
+			filemtime(get_template_directory().'/js/scripts.js'),
+			true
 		);
 		wp_enqueue_style(
 			'theme-styles',
@@ -247,6 +249,7 @@ class Plz {
 		wp_enqueue_style('dashicons');
 	}
 }
+$plz = new Plz();
 </code>
 					</pre>
 					<aside class="notes">
@@ -289,6 +292,88 @@ wp_enqueue_script( 'jquery', includes_url( '/js/jquery/jquery.js' ), false, fals
 				<section>
 					<img src="img/nextgen.png">
 					<img src="img/kramer.gif">
+
+					<aside class="notes">
+						<p>So before you freak out, NextGen actually addressed this issue. According to the changelog, it was February of last year. That being said, this plus some other behavior I'm not super fond of kept me away from NextGen long enough that I wasn't around to hear it was fixed. It's also a great lesson to be learned.</p>
+
+						<p>Here's the story: at the point in time where this was a problem, NextGen loaded about 13 styles and scripts to do some of its basic gallery things. Now even if that's only showing up on one page, that's a lot. But here's the kicker - you could spin up a default WordPress site, base theme, not touch any settings. Install NextGen, don't even set up a gallery or upload photos. If you checked out the network tab on your home page, there were those 13 scripts and styles. On every page. Whew.</p>
+
+						<p>Like I said, they've cleaned it up, which is awesome, and if you peruse the changelog, they've been making a lot of efforts at being performant, which is nifty.</p>
+
+						<p>Here's another, less dramatic example - Contact Form 7. To this day, Contact Form 7 makes 3 requests on every page on your site - 2 scripts, dutifully in the footer, and one stylesheet. Let's go ahead and demo that.</p>
+					</aside>
+
+				</section>
+				<section>
+					<h1>Demo Time</h1>
+					<a href="http://contactform7.com/loading-javascript-and-stylesheet-only-when-it-is-necessary/">Clean up Contact Form 7 Scripts and Styles</a>
+					<aside class="notes">
+						<p>There's even a blog post on the developer's website telling you how to turn it off. I don't know the intricacies of how Contact Form 7 works, but I'd like to think this could be avoided out of the box.</p>
+					</aside>
+				</section>
+				<section>
+					<h1>Level 2</h1>
+					<h2>Optimization</h2>
+
+					<aside class="notes">
+						<p>Thus far, we've talked about ways that WordPress allows us to make sure that the actual task of making a request is done intelligently - only when necessary and without duplication of resources. Now let's see what we can do with our code to make the files themselves more efficient.</p>
+					</aside>
+				</section>
+				<section>
+					<h1>CSS Preprocessors</h1>
+					<ul>
+						<li>Scss, LESS</li>
+						<li><a href="https://prepros.io/">PrePros</a>, <a href="https://getcrunch.co/">Crunch</a>, <a href="https://incident57.com/codekit/">CodeKit</a></li>
+					</ul>
+
+					<aside class="notes">
+						<p>First let's talk about CSS preprocessors. How many people in the room are writing vanilla CSS? Alright, a few of you. Many of you may be familiar with these and just don't care and for others, maybe this is news to you.</p>
+
+						<p>There are a couple of big CSS extension languages out there called LESS and Sass, or SCSS. Neither of them are technically required for using CSS preprocessors, but they sure are nice. They let us declare variables, use imports, nest selectors, define "functions", lots of fun stuff. Explore them if you haven't.</p>
+
+						<p>But the browser can't read any of these extension languages, so we use CSS preprocessors. I'm familiar with a few I've listed here, and your neighbor probably has their favorite. These will compile your scss or your less into browser-friendly CSS. In regards to our talk today, I'm going to talk about two big things we get out of these: concatenation and minification.</p>
+
+						<p>Open WordCamp demo theme</p>
+
+						<p>So here's a pretty basic WordPress theme. I've got a header, footer, index, functions and styles. Really about the bare minimum, you can ignore some of that other stuff for now. Now I can open my styles.css file and you see I've got some basic styles here, and if we open my functions.php file, you'll see I've enqueued it. Let's hop on the front of the site and, sure enough, I've got a pretty straightforward "Hello World". Great.</p>
+
+						<p>How about I want to load up another CSS file? I'm a good dev, I like to keep my code compartmentalized. Atomic design and all that. So I hop into my css folder directory and I've got a new styles.css here. Let's add something silly, like make my background orange, and then go over to functions and enqueue that. Refresh and the background is orange. Well that _works_, but now we're up a request. Yuck. How can we avoid that? Well we can put all our styles in one file, but that becomes unmanageable. How about a CSS extension language?</p>
+
+						<p>For this example, I'm using my extension of choice, scss. I'll hop into my scss directory, set up a new file here and copy over the code from my original stylesheet. Now if you're using a tool like Prepros, you can drag your theme right in here and it's going to automatically find your scss and compile it as soon as we save. Let's go back to our file, save, and sure enough, we get a quick notification that says everything went well. And if we open up our css folder, we see its contents have been replaced with the results of the compilation. Couldn't be much easier. Let's go over to functions and enqueue this sheet instead of the default one. Perfect.</p>
+
+						<p>Now let's get back to compartmentalized code: I want several files, but just one request. Well with scss, that becomes super easy. I can create a new directory here called partials, create a new file, for now we'll call it foo.scss or something, and we can make our background orange right here. Now back in our main styles.css, I can @import my other stylesheet right underneath my other styles. Let's save and refresh, sure enough, we've got an orange background.</p>
+
+						<p>And that scales very very well. I can also configure PrePros to minify my files when it's done so that I end up with the smallest filesize possible. It'll do the same kind of thing for Javascript files, too - concatenation and minification, and compilation if you're using something like CoffeeScript.</p>
+				</section>
+
+				<section>
+					<h1>Level 3</h1>
+					<h2>Task Runners</h2>
+					<ul>
+						<li>Gulp</li>
+						<li>Grunt</li>
+					</ul>
+
+					<aside class="notes">
+						<p>
+							Now personally, I'm not much for these big GUI apps. They do what they do well, but there's a lot more out there you can do, and for that, you're going to need something more extensible, and that's task runners. These have gotten super popular recently. These are command line tools generally based on Node.js, which is like server-side javascript. Gulp and Grunt are the two big ones, and I'm going to give you a quick look at Gulp by getting it configured to do the same stuff that PrePros was doing. This is going to be a super-fast crash course and you should definitely look for tutorials on getting started with this stuff. I'm just here to convince you it's awesome.
+						</p>
+						<p>
+							First, you'll want to set up a package.json that says your project requires gulp. It does this via a tool called npm, which stands for node package manager. You can Google that for more information about getting set up.
+						</p>
+						<p>
+							So gulp operates on the idea of plugins, all of which are also maintained on npm. I'm gone ahead and installed gulp-sass, which will compile our scss for us. Let's go ahead and pause PrePros, wipe our CSS directory to make sure I'm not fooling you, and then from the command line we can run `gulp sass`. Our CSS file is generated and boom, refresh, same result. You can see i've also set up a watch task, so we can have gulp watch for file changes just like PrePros was doing.
+						</p>
+						<p>
+							How about minification? Auto-prefixing? All done via other gulp plugins that I've already installed. I'll go ahead and comment out the autoprefixer stuff here, save, check out our CSS and our flexbox is set for a variety of browsers. Same for minification.
+						</p>
+						<p>
+							Gulp can be extended to do all kinds of stuff with your CSS, include compare it against your markup to figure out which selectors aren't actually being used and clean those from your compiled file. It'll also do your Javascript, minify images, generate spritesheets - you can do a lot with this thing.
+						</p>
+						<p>
+							Last thing on gulp, I'm going to show you the gulpfile I like to use for production. I've actually further obfuscated gulp behind a wonderful library from Laravel called Elixir. Let's open that up and take a look at what it's doing really quickly.
+						</p>
+					</aside>
 				</section>
 			</div>
 		</div>
