@@ -255,7 +255,7 @@ $plz = new Plz();
 					<aside class="notes">
 						<p>So like good PHP programmers, we're going to wrap our functions file or our plugin in a class and not clutter the global namespace. Then we can hook into the wp_enqueue_scripts action with our own function and queue up some stuff. You'll see we give our resource a handle and then a URL. In our second script here you'll see I've included a third argument, which is dependencies. Our theme's scripts depend on jQuery, so WordPress won't load them without jQuery. Then we've got our theme styles, and you can see here I haven't passed any dependencies, but I have passed a function for the write time of the file - this is a fun way to cache-bust your resources. Finally, WordPress also has already registered a handle for dashicons so we can enqueue that by itself. I'll explain registering a bit later.</p>
 
-						<p>Cool, okay, so what other WordPress stuff can we do? I vote we move jQuery to the footer. By default, WordPress sticks it in the header - gross. If your site depends on jQuery for the layout to be right and takes so long to load that the user is going to do something that should fire some jQuery logic before the page is loaded, you’ve got other problems. You might rethink your layout. This is also a great intro to manipulating third-party plugins’ scripts and styles - another handy advantage of these functions. Here’s how we can do that:</p>
+						<p>Cool, okay, so what other WordPress stuff can we do? I vote we move jQuery to the footer. By default, WordPress sticks it in the header - gross. If your site depends on jQuery for the layout to be right or takes so long to load that the user is going to do something that should fire some jQuery logic before the page is loaded, you’ve got other problems. You might rethink your layout. This is also a great intro to manipulating third-party plugins’ scripts and styles - another handy advantage of these functions. Here’s how we can do that:</p>
 					</aside>
 				</section>
 
@@ -356,23 +356,99 @@ wp_enqueue_script( 'jquery', includes_url( '/js/jquery/jquery.js' ), false, fals
 
 					<aside class="notes">
 						<p>
-							Now personally, I'm not much for these big GUI apps. They do what they do well, but there's a lot more out there you can do, and for that, you're going to need something more extensible, and that's task runners. These have gotten super popular recently. These are command line tools generally based on Node.js, which is like server-side javascript. Gulp and Grunt are the two big ones, and I'm going to give you a quick look at Gulp by getting it configured to do the same stuff that PrePros was doing. This is going to be a super-fast crash course and you should definitely look for tutorials on getting started with this stuff. I'm just here to convince you it's awesome.
+							Now personally, I'm not much for these big GUI apps. They do what they do well, but there's a lot more out there you can do with your files of all kinds, and for that, you're going to need something more extensible. The solution is task runners. These have gotten super popular recently. These are command line tools generally based on Node.js, which is like server-side javascript. Gulp and Grunt are the two big ones, and I'm going to give you a quick look at Gulp by getting it configured to do the same stuff that PrePros was doing. This is going to be a super-fast crash course and you should definitely look for tutorials on getting started with this stuff. I'm just here to convince you it's awesome.
 						</p>
 						<p>
-							First, you'll want to set up a package.json that says your project requires gulp. It does this via a tool called npm, which stands for node package manager. You can Google that for more information about getting set up.
+							First, you'll want to set up a package.json that says your project requires gulp. [Explain package.json] It does this via a tool called npm, which stands for node package manager. You can Google that for more information about getting set up.
 						</p>
 						<p>
-							So gulp operates on the idea of plugins, all of which are also maintained on npm. I'm gone ahead and installed gulp-sass, which will compile our scss for us. Let's go ahead and pause PrePros, wipe our CSS directory to make sure I'm not fooling you, and then from the command line we can run `gulp sass`. Our CSS file is generated and boom, refresh, same result. You can see i've also set up a watch task, so we can have gulp watch for file changes just like PrePros was doing.
+							So gulp operates on the idea of plugins, all of which are also maintained on npm. I'm gone ahead and installed gulp-sass, which will compile our scss for us. Let's go ahead and pause PrePros, wipe our CSS directory to make sure I'm not fooling you, and then from the command line we can run `gulp sass`. Our CSS file is generated and boom, refresh, same result. You can see I've also set up a watch task, so we can have gulp watch for file changes just like PrePros was doing.
 						</p>
 						<p>
-							How about minification? Auto-prefixing? All done via other gulp plugins that I've already installed. I'll go ahead and comment out the autoprefixer stuff here, save, check out our CSS and our flexbox is set for a variety of browsers. Same for minification.
+							How about minification? Auto-prefixing? All done via other gulp plugins that I've already installed. I'll go ahead and uncomment the autoprefixer stuff here, save, check out our CSS and our flexbox is set for a variety of browsers. Same for minification.
 						</p>
 						<p>
-							Gulp can be extended to do all kinds of stuff with your CSS, include compare it against your markup to figure out which selectors aren't actually being used and clean those from your compiled file. It'll also do your Javascript, minify images, generate spritesheets - you can do a lot with this thing.
+							Gulp can be extended to do all kinds of stuff with your CSS - create spritesheets, compare against your markup and prune unused selectors, it's awesome. It'll also do your Javascript, minify images - you can do a lot with this thing.
 						</p>
 						<p>
-							Last thing on gulp, I'm going to show you the gulpfile I like to use for production. I've actually further obfuscated gulp behind a wonderful library from Laravel called Elixir. Let's open that up and take a look at what it's doing really quickly.
+							Last thing on gulp, I'm going to show you the gulpfile I like to use for production. I've actually further abstracted gulp behind a wonderful library from Laravel called Elixir. Let's open that up and take a look at what it's doing really quickly.
 						</p>
+					</aside>
+				</section>
+				<section>
+					<h1>CDN vs Self-hosted</h1>
+					<aside class="notes">
+						<p>
+							All right, so the last thing I want to talk about today is CDNs. Raise your hand if you aren't familiar with CDNs. Real quick, a CDN or content-delivery network is a strategy for dispersing commonly-used resources across the world to minimize latency and downtime for delivery. If you've ever used a third-party front-end library, you've probably seen getting started instructions that inclue fetching from a CDN like MaxCDN, Google, there are a bunch. There are a variety of advantages to this strategy.
+						<p>
+					</aside>
+				</section>
+
+				<section>
+					<h2>CDN Advantages</h2>
+					<ul>
+						<li>Server potentially closer to the user</li>
+						<li>Potential pre-cache</li>
+						<li>One less request in your server's pipeline</li>
+						<li>Generally, high uptime</li>
+					</ul>
+					<aside class="notes">
+						<p>CDNs are awesome for a few reasons. The first is that the CDN's location is likely closer to your user and hosted on a pretty kicking server, so the latency is likely to be low.</p>
+						<p>
+							There's also the advantage that this could be the same resources that a variety of sites around the internet are using, including ones your user has already visited. That means, at least on the first page load, there's a possibility that the file is already cached on the user's browser, which is good news for you. If not, their browser wil cache it after that and hopefully it'll benefit someone else down the line.
+						</p>
+						<p>
+							Remember when we talked about that HTTP pipeline and how you can only have 4 concurrent connections to any one server? With CDNs, you take a request out of your stack and put it in another. Neato.
+						</p>
+						<p>
+							And finally, these are companies that make their money by providing high uptime and low latency across a distributed network, so they do it pretty well.
+						</p>
+					</aside>
+				</section>
+				<section>
+					<h2>CDN disadvantages</h2>
+					<ul>
+						<li>Uptime? Who cares?</li>
+						<li>I'm lazy and upgrade-happy</li>
+						<li>No CSS optimization</li>
+						<li>Giving up control</li>
+						<li>$</li>
+					</ul>
+					<aside class="notes">
+						<p>
+							This all sounds pretty good. Any disadvantages? Some.
+						</p>
+						<p>
+							So first, I don't really care about uptime if the alternative is hosting it myself. If my site is down, it's not going to matter if I can fetch Bootstrap from the CDN, my site is down. If my site is up, I'll be able to fetch my own site from my own server. Similarly, let's say the CDN _did_ go down - now my site may load without the basic CSS framework. If you've been thoughtful about it, this may fall back to something useable, but that's not always true, so now it just looks like your site is broken. Personally, I'd rather all or nothing.
+						</p>
+						<p>
+							Next, I really like to upgrade libraries. If I'm doing work on an existing client site, the first thing I often do is an npm update and get all my front-end libraries up-to-date before building, testing locally and pushing out. I like to think this minimizes bugs and potential security holes, though with front-end libraries that isn't usually a concern. With CDNs, the URL you're hitting is generally versioned, but I don't really care to figure out which version is the latest and then bump all my URLs manually. By the same token, I don't want to use the "latest" URL if the CDN offers it, because then any updates hit the live site without my oversight.
+						</p>
+						<p>
+							CSS optimization. Let's go back to that scss file we were working with earlier. You'll notice here I've commented out a _lot_ of bootstrap rather than just @include bootstrap. I often only use the grid - some of this stuff I never comment out on any sites I work on. This makes sure my CSS is only as big as it needs to be. With a CDN, it's all or nothing. Now a lot of libraries only have one file, so it really doesn't make a difference like it does here with Bootstrap or other CSS frameworks.
+						</p>
+						<p>
+							Giving up control. While unlikely, there's a possibility that your CDN is compromised or goes rouge or whatever and suddenly you're served up alternative or even malicious files. Or maybe they're collecting referrer information and using it to track your users? The former is unlikely and the latter is a small drop in a pool of questionable big data practices, but if it's something you're worried about, a CDN probably isn't for you. A tinfoil hat, however, might be.
+						</p>
+						<p>
+							Finally, if you're looking to host your own resources on a CDN, that's going to cost money. If that's something you or your client have budgeted for, great, and if not, this may not be an option.
+						</p>
+						<p>
+							As with most of the stuff I've talked about today, use your best judgement. A CDN is great for some situations and not so much for others. To be honest, Google Fonts and Typekit are the only two that I regularly use, as I prefer to bundle all my resources together for a single request in most other situations.
+						</p>
+					</aside>
+				</section>
+				<section>
+					<h2>In Review</h2>
+					<ul>
+						<li>Enqueue your requests, and enqueue them conditionally</li>
+						<li>Make fewer requests</li>
+						<li>Optimize your resources</li>
+						<li>Task runners are your friend</li>
+						<li>Consider a CDN</li>
+					</ul>
+					<aside class="notes">
+						And that about wraps it up. Let's review real quickly what we went over today: [blah]. Any questions?
 					</aside>
 				</section>
 			</div>
