@@ -277,6 +277,7 @@ wp_enqueue_script( 'jquery', includes_url( '/js/jquery/jquery.js' ), false, fals
 					<ul>
 						<li>wp_enqueue_script is indiscriminate</li>
 						<li>wp_register_script</li>
+						<li>Enqueue at entry point</li>
 					</ul>
 					<aside class="notes">
 						<p>Various plugins you install to your site or that you develop are going to need their own scripts and styles. "Yeah! So I’ll just hook into wp_enqueue_scripts() and enqueue my scripts!" Don’t do that, probably.</p>
@@ -361,19 +362,29 @@ wp_enqueue_script( 'jquery', includes_url( '/js/jquery/jquery.js' ), false, fals
 						<p>
 							First, you'll want to set up a package.json that says your project requires gulp. [Explain package.json] It does this via a tool called npm, which stands for node package manager. You can Google that for more information about getting set up.
 						</p>
+						<p>Next let's check out our gulpfile.js</p>
 						<p>
 							So gulp operates on the idea of plugins, all of which are also maintained on npm. I'm gone ahead and installed gulp-sass, which will compile our scss for us. Let's go ahead and pause PrePros, wipe our CSS directory to make sure I'm not fooling you, and then from the command line we can run `gulp sass`. Our CSS file is generated and boom, refresh, same result. You can see I've also set up a watch task, so we can have gulp watch for file changes just like PrePros was doing.
 						</p>
 						<p>
 							How about minification? Auto-prefixing? All done via other gulp plugins that I've already installed. I'll go ahead and uncomment the autoprefixer stuff here, save, check out our CSS and our flexbox is set for a variety of browsers. Same for minification.
 						</p>
-						<p>
-							Gulp can be extended to do all kinds of stuff with your CSS - create spritesheets, compare against your markup and prune unused selectors, it's awesome. It'll also do your Javascript, minify images - you can do a lot with this thing.
-						</p>
-						<p>
-							Last thing on gulp, I'm going to show you the gulpfile I like to use for production. I've actually further abstracted gulp behind a wonderful library from Laravel called Elixir. Let's open that up and take a look at what it's doing really quickly.
-						</p>
 					</aside>
+				</section>
+				<section>
+					<h1>What else can gulp do?</h1>
+						<ul>
+							<li>Spriresheets</li>
+							<li>Prune CSS</li>
+							<li>Optimize images</li>
+							<li>JavaScript</li>
+						</ul>
+					<p>
+						Gulp can be extended to do all kinds of stuff with your CSS - create spritesheets, compare against your markup and prune unused selectors, it's awesome. It'll also do your Javascript, minify images - you can do a lot with this thing.
+					</p>
+					<p>
+						Last thing on gulp, I'm going to show you the gulpfile I like to use for production. I've actually further abstracted gulp behind a wonderful library from Laravel called Elixir. Let's open that up and take a look at what it's doing really quickly.
+					</p>
 				</section>
 				<section>
 					<h1>CDN vs Self-hosted</h1>
