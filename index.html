@@ -6,22 +6,14 @@
 
 		<title>Please Enqueue Responbily - Ethan Clevenger</title>
 
-		<link rel="stylesheet" href="css/reveal.css">
-		<link rel="stylesheet" href="css/theme/night.css">
+		<link rel="stylesheet" href="dist/reset.css">
+		<link rel="stylesheet" href="dist/reveal.css">
+        <link rel="stylesheet" href="dist/theme/night.css">
 		<link href='https://fonts.googleapis.com/css?family=Lobster' rel='stylesheet' type='text/css'>
 		<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
 		<!-- Theme used for syntax highlighting of code -->
-		<link rel="stylesheet" href="lib/css/zenburn.css">
-
-		<!-- Printing and PDF exports -->
-		<script>
-			var link = document.createElement( 'link' );
-			link.rel = 'stylesheet';
-			link.type = 'text/css';
-			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
-			document.getElementsByTagName( 'head' )[0].appendChild( link );
-		</script>
+		<link rel="stylesheet" href="plugin/hightlight/zenburn.css">
 	</head>
 	<body>
 		<div class="reveal">
@@ -209,20 +201,20 @@
 					</aside>
 				</section>
 				<section>
-					<pre style="width:100%"><code data-trim>
+					<pre style="width:100%"><code data-trim data-noescape><script type="text/template">
 <head>
 <link href="<?php echo get_template_directory_uri(); ?>/style.css" rel="stylesheet" type="text/css">
 <link href="<?php echo home_url(); ?>/wp-includes/css/dashicons.css" rel="stylesheet" type="text/css">
 <script src="<?php echo get_template_directory_uri(); ?>/js/scripts.js"></script>
 <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 </head>
-					</code></pre>
+                </script></code></pre>
 					<aside class="notes">
 						<p>Okay, so what's wrong here? First we've linked in our theme's styles, which is probably fine. Next, oh, well looks like we wanted to use WordPress's dashicons on the front end. Hope they don't move those on us. Next we've got our theme's scripts, once again, pretty unremarkable, and finally, ah, yes. We've loaded jQuery from a CDN like everyone tells us to, but there are a couple issues. First issue is our own scripts probably depend on jQuery but we've loaded them out of order. Furthermore, some plugin author is probably going to load WordPress's jQuery, so then we'll have two versions loaded together, which never pans out. Finally, you generally don't need to put your script tags in your header and hold up the rest of the site. That's called render-blocking content.</p>
 					</aside>
 				</section>
 				<section>
-					<pre><code style="max-height:none" data-trim>
+					<pre><code style="max-height:none" data-trim data-noescape>
 class Plz {
 	function __construct() {
 		add_action('wp_enqueue_scripts', [$this, 'wp_enqueue_scripts']);
@@ -261,7 +253,7 @@ $plz = new Plz();
 
 				<section>
 
-					<pre><code class="data-trim">
+					<pre><code data-trim data-noescape>
 wp_deregister_script( 'jquery' );
 wp_enqueue_script( 'jquery', includes_url( '/js/jquery/jquery.js' ), false, false, true );
 					</code></pre>
@@ -454,23 +446,19 @@ wp_enqueue_script( 'jquery', includes_url( '/js/jquery/jquery.js' ), false, fals
 			</div>
 		</div>
 
-		<script src="lib/js/head.min.js"></script>
-		<script src="js/reveal.js"></script>
-
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
 		<script>
-			// More info https://github.com/hakimel/reveal.js#configuration
+			// More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
 			Reveal.initialize({
-				history: true,
+				hash: true,
 
-				// More info https://github.com/hakimel/reveal.js#dependencies
-				dependencies: [
-					{ src: 'socket.io/socket.io.js', async: true },
-        	{ src: 'plugin/notes-server/client.js', async: true },
-					{ src: 'plugin/markdown/marked.js' },
-					{ src: 'plugin/markdown/markdown.js' },
-					{ src: 'plugin/notes/notes.js', async: true },
-					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
-				]
+				// Learn about plugins: https://revealjs.com/plugins/
+				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
 			});
 		</script>
 	</body>
